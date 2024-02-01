@@ -1,4 +1,6 @@
 import { Body, Controller, Get, Param, Patch, Post, Put } from "@nestjs/common";
+import { CreateUserDTO } from "src/dto/create-user.dto";
+import { UpdatePutUserDTO } from "src/dto/update-put-user.dto";
 
 @Controller('users')
 export class UserController {
@@ -14,17 +16,16 @@ export class UserController {
     }
 
     @Post()
-    async createUser(@Body() dadosUser){
-        return {
-            'Body' : dadosUser
-        }
+    async createUser(@Body() body: CreateUserDTO){
+        return {body}
     }
 
     @Put(':id')
-    async updateUser(@Body() dadosUser, @Param() param){
+    async updateUser(@Body() {email, name, password}: UpdatePutUserDTO, @Param() params){
         return {
-            'body' : dadosUser,
-            'IdUser' : param
+            method : 'put',
+            email, name, password,
+            params
         }
     }
 
