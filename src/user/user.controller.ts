@@ -12,8 +12,8 @@ export class UserController {
     }
 
     @Get(':id')
-    async findUser(@Param() params) {
-        return {user:{}, params}
+    async findUser(@Param('id', ParseIntPipe) id: number) {
+        return {user:{}, id}
     }
 
     @Post()
@@ -22,25 +22,29 @@ export class UserController {
     }
 
     @Put(':id')
-    async updateUser(@Body() {email, name, password}: UpdatePutUserDTO, @Param() params){
+    async updateUser(
+        @Body() {email, name, password}: UpdatePutUserDTO,
+        @Param('id', ParseIntPipe) id: number){
         return {
             method : 'put',
             email, name, password,
-            params
+            id
         }
     }
 
     @Patch(':id')
-    async updateUserPartial(@Body() {email, name, password}: UpdatePatchUser, @Param() params){
+    async updateUserPartial(
+     @Body() {email, name, password}: UpdatePatchUser,
+     @Param('id', ParseIntPipe) id: number){
         return {
             method : 'patch',
             email, name, password,
-            params
+            id
         }
     }
 
     @Delete(':id')
-    async delete(@Param('id', ParseIntPipe) id){
+    async delete(@Param('id', ParseIntPipe) id: number){
         return {
             id
         }
