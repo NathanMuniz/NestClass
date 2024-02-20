@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, NotFoundException } from "@nestjs/common";
 import { CreateUserDTO } from "src/dto/create-user.dto";
 import { UpdatePatchUser } from "src/dto/update-patch-user.dto";
 import { UpdatePutUserDTO } from "src/dto/update-put-user.dto";
@@ -7,10 +7,10 @@ import { PrismaService } from "src/prisma/prisma.service";
 @Injectable()
 export class UserService {
 
-    constructor(private readonly prisma: PrismaService) {}
+    constructor(private readonly prisma: PrismaService) { }
 
 
-    async create({email, name, password}: CreateUserDTO){
+    async create({ email, name, password }: CreateUserDTO) {
 
         return this.prisma.user.create({
             data: {
@@ -32,7 +32,8 @@ export class UserService {
 
     }
 
-    async show(id: number){
+    async show(id: number) {
+
         return this.prisma.user.findUnique({
             where: {
                 id
@@ -40,37 +41,44 @@ export class UserService {
         })
     }
 
-    async update(id: number, {email, name, password, birthAt}: UpdatePutUserDTO){
-        console.log({email, name, password});
+    async update(id: number, { email, name, password, birthAt }: UpdatePutUserDTO) {
 
-        if (!birthAt){
+        await this.exits(id)
+
+
+        console.log({ email, name, password });
+
+        if (!birthAt) {
             birthAt = null;
         }
 
         return this.prisma.user.update({
-            data: {email, name, password, birthAt: birthAt ? new Date(birthAt) : null},
+            data: { email, name, password, birthAt: birthAt ? new Date(birthAt) : null },
             where: {
                 id
             }
         })
     }
 
-    async updatePartial(id: number, {email, name, password, birthAt}: UpdatePatchUser){
+    async updatePartial(id: number, { email, name, password, birthAt }: UpdatePatchUser) {
+
+        await this.exits(id)
+
 
         const data: any = {}
 
-        if(birthAt) {
+        if (birthAt) {
             data.birthAt = new Date(birthAt)
         }
 
 
         if (name) {
             data.name = name;
-        } 
+        }
 
         if (email) {
             data.email = email;
-        } 
+        }
 
         if (password) {
             data.password = password;
@@ -85,6 +93,24 @@ export class UserService {
             }
         })
     }
+
+    async delete(id: number) {
+
+        await this.exits(id)
+
+
+        return this.prisma.user.delete({
+            where: {
+                id,
+            },
+        })
+    }
+    async exits(id: number) {
+        if (!(await this.show(id))) {
+            throw new NotFoundException('The user do not exists')
+        }
+    }
+
 
 
 }
